@@ -1,0 +1,27 @@
+name: CI - Test Microservizio
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout codice
+      uses: actions/checkout@v3
+
+    # Docker Compose è già installato su ubuntu-latest, non serve installarlo a mano!
+
+    - name: Avvia servizi con Docker compose
+      run: docker-compose -f docker-compose.yml up -d
+
+    - name: Esegui i test
+      # Assicurati che il servizio nel docker-compose si chiami 'microservizio'
+      run: docker-compose -f docker-compose.yml exec -T microservizio pytest
+
+    - name: Cleanup finale
+      run: docker-compose -f docker-compose.yml down -v
